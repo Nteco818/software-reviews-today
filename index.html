@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Software review today ·电商工具 · 科技趋势 · 分享与实践 · 行业观察</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Software Review Today：专注电商工具与科技趋势，分享数字化增长的深度实践与行业洞察。">
+<meta name="robots" content="index,follow">
+<style>
+/* ===== 基础 ===== */
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial;
+  background:#fff;
+  color:#111;
+}
+a{color:#111;text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ===== 布局 ===== */
+.wrap{
+  max-width:900px;
+  margin:0 auto;
+  padding:28px 18px;
+}
+header h1{
+  margin:0 0 8px;
+  font-size:32px;
+  letter-spacing:.2px;
+}
+.sub{
+  margin:0 0 6px;
+  color:#666;
+  font-size:15px;
+}
+.tools{
+  margin:0 0 28px;
+  color:#555;
+  font-size:14px;
+}
+
+/* ===== 搜索 ===== */
+.search{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:26px;
+}
+input,select{
+  padding:10px 12px;
+  border:1px solid #ddd;
+  border-radius:8px;
+  font-size:14px;
+}
+
+/* ===== 文章列表 ===== */
+h2{
+  margin:26px 0 14px;
+  font-size:22px;
+}
+.article{
+  padding:18px 0;
+  border-bottom:1px solid #eee;
+}
+.article h3{
+  margin:0 0 6px;
+  font-size:18px;
+  line-height:1.45;
+}
+.meta{
+  font-size:13px;
+  color:#777;
+  margin-bottom:6px;
+}
+.excerpt{
+  margin:0;
+  color:#444;
+  line-height:1.7;
+}
+
+/* ===== 页脚 ===== */
+footer{
+  margin-top:60px;
+  padding-top:20px;
+  border-top:1px solid #eee;
+  color:#777;
+  font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <!-- 顶部 -->
+  <header>
+    <h1>Software review today</h1>
+    <p class="sub">电商工具 · 科技趋势 · 分享与实践 · 行业观察</p>
+    <p class="tools">互动 / 跨境 / 科技 / 工作提效 / 便捷工具 / AI</p>
+  </header>
+
+  <!-- 搜索与筛选 -->
+  <div class="search">
+    <input id="q" placeholder="搜索文章…" />
+    <select id="cat">
+      <option value="">全部工具分类</option>
+    </select>
+  </div>
+
+  <!-- 文章目录（核心索引区） -->
+  <h2>最新文章</h2>
+  <div id="list">
+    <!-- fallback，防止 JS 未加载 -->
+    <article class="article">
+      <h3>内容加载中…</h3>
+      <p class="excerpt">如果长时间未显示，请检查 posts.json 是否可访问。</p>
+    </article>
+  </div>
+
+  <footer>
+    Software review today · 好用有趣高效的工具软件集合
+  </footer>
+
+</div>
+
+<script>
+/*
+  核心逻辑说明：
+  - 只请求 /posts.json（与你的真实路径一致）
+  - JS 失败时页面也不会“空白”
+*/
+(async ()=>{
+  let posts = [];
+  try {
+    const res = await fetch('/posts.json', { cache: 'no-store' });
+    posts = await res.json();
+  } catch (e) {
+    document.getElementById('list').innerHTML =
+      '<p>文章索引加载失败，请确认 posts.json 路径。</p>';
+    return;
+  }
+
+  const list = document.getElementById('list');
+  const q = document.getElementById('q');
+  const catSel = document.getElementById('cat');
+
+  // 填充分类
+  [...new Set(posts.map(p => p.category).filter(Boolean))].forEach(c => {
+    const o = document.createElement('option');
+    o.value = c;
+    o.textContent = c;
+    catSel.appendChild(o);
+  });
+
+  function render(){
+    const kw = q.value.toLowerCase();
+    const c = catSel.value;
+
+    const arr = posts.filter(p => {
+      const hit =
+        !kw ||
+        p.title.toLowerCase().includes(kw) ||
+        (p.excerpt || '').toLowerCase().includes(kw);
+      const ok = !c || p.category === c;
+      return hit && ok;
+    });
+
+    list.innerHTML = arr.map(p => `
+      <article class="article">
+        <h3><a href="${p.url}">${p.title}</a></h3>
+        <div class="meta">${p.date} · ${p.category}</div>
+        <p class="excerpt">${p.excerpt}</p>
+      </article>
+    `).join('') || '<p>暂无匹配内容</p>';
+  }
+
+  q.oninput = render;
+  catSel.onchange = render;
+  render();
+})();
+</script>
+
+</body>
+</html>
