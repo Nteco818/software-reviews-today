@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-const SITE_URL = "https://imnews.vercel.app";
+const SITE_URL = "https://software-reviews.netlify.app/";
 
 const ROOT = process.cwd();
 const POST_DIR = path.join(ROOT, "post");
