@@ -4,7 +4,7 @@ import path from "path";
 /**
  * 站点配置
  */
-const SITE_URL = "https://software-reviews.netlify.app";
+const SITE_URL = "https://software-reviews.onrender.com/";
 
 /**
  * 路径
